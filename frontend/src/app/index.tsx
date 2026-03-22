@@ -1,12 +1,5 @@
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Redirect } from "expo-router";
 
-export default function HomeScreen() {
-  return (
-    <SafeAreaView>
-      <View>
-        <Text className="text-2xl">Hello jh</Text>
-      </View>
-    </SafeAreaView>
-  );
+export default function Index() {
+  return <Redirect href="/(auth)/login" />;
 }
