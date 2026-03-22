@@ -1,7 +1,8 @@
-const { getRabbitChannel } = require("../../config/rabbitmq");
-const env = require("../../config/env");
+import { getRabbitChannel } from "../../config/rabbitmq";
+import env from "../../config/env";
+import { MessageData } from "../../modules/messages/message.repository";
 
-async function publishMessageForPersistence(messageJob) {
+export async function publishMessageForPersistence(messageJob: MessageData): Promise<void> {
   const channel = getRabbitChannel();
   const payload = Buffer.from(JSON.stringify(messageJob));
 
@@ -11,7 +12,3 @@ async function publishMessageForPersistence(messageJob) {
     messageId: messageJob.messageId,
   });
 }
-
-module.exports = {
-  publishMessageForPersistence,
-};

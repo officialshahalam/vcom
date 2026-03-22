@@ -1,6 +1,17 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Schema } from "mongoose";
 
-const messageSchema = new mongoose.Schema(
+export type MessageType = "text" | "image" | "file" | "system";
+
+export interface IMessage extends Document {
+  messageId: string;
+  chatId: string;
+  senderId: string;
+  type: MessageType;
+  text: string;
+  createdAt: Date;
+}
+
+const messageSchema = new Schema<IMessage>(
   {
     messageId: {
       type: String,
@@ -38,4 +49,4 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Message", messageSchema);
+export default mongoose.model<IMessage>("Message", messageSchema);

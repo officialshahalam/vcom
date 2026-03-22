@@ -1,20 +1,15 @@
-function logInfo(message, meta) {
-  if (meta) {
+export function logInfo(message: string, meta?: unknown): void {
+  if (meta !== undefined) {
     console.log(`[INFO] ${message}`, meta);
     return;
   }
   console.log(`[INFO] ${message}`);
 }
 
-function logError(message, error) {
-  if (error) {
+export function logError(message: string, error?: unknown): void {
+  if (error !== undefined) {
     console.error(`[ERROR] ${message}`, error);
     return;
   }
   console.error(`[ERROR] ${message}`);
 }
-
-module.exports = {
-  logInfo,
-  logError,
-};

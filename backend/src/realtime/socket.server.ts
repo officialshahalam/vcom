@@ -1,8 +1,9 @@
-const { Server } = require("socket.io");
-const env = require("../config/env");
-const registerSocketEvents = require("./socket.events");
+import { Server } from "socket.io";
+import { Server as HttpServer } from "http";
+import env from "../config/env";
+import registerSocketEvents from "./socket.events";
 
-function createSocketServer(httpServer) {
+export function createSocketServer(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
     cors: {
       origin: env.clientOrigin,
@@ -17,7 +18,3 @@ function createSocketServer(httpServer) {
 
   return io;
 }
-
-module.exports = {
-  createSocketServer,
-};

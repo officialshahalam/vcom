@@ -1,8 +1,8 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 
 dotenv.config();
 
-module.exports = {
+const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 5001),
   mongoUri: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/vcom",
@@ -17,3 +17,5 @@ module.exports = {
     flushIntervalMs: Number(process.env.MESSAGE_FLUSH_INTERVAL_MS || 1000),
   },
 };
+
+export default env;
