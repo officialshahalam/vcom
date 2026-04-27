@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              Int                       @id @default(autoincrement())
+  fullName        String
+  username        String                    @unique
+  mobileNumber    String                    @unique
+  email           String?
+  passwordHash    String
+  profilePicture  String?
+  bio             String?
+  isVerified      Boolean                   @default(false)
+  isOnline        Boolean                   @default(false)
+  lastSeen        DateTime                  @default(now())
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  otps            OTP[]
+  messagesSent    Message[]                 @relation("MessageSender")
+  conversations   ConversationParticipant[]
+  readReceipts    MessageReadReceipt[]
+}
+
+model OTP {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  code      String
+  type      OTPType
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, code, type, isUsed])
+}
+
+model Conversation {
+  id           Int                       @id @default(autoincrement())
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  userId         Int
+  joinedAt       DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             Int                  @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  content        String
+  sentAt         DateTime             @default(now())
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  conversation   Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User                 @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  readReceipts   MessageReadReceipt[]
+
+  @@index([conversationId, sentAt])
+}
+
+model MessageReadReceipt {
+  id        Int      @id @default(autoincrement())
+  messageId Int
+  userId    Int
+  readAt    DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+enum OTPType {
+  SIGNUP
+  RESET_PASSWORD
+}
+

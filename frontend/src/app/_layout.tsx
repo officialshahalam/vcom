@@ -1,13 +1,28 @@
-import React from "react";
-import { Text } from "react-native";
+import React, { useEffect } from "react";
+import { Stack } from "expo-router";
 import "../global.css";
+import { useWebSocket } from "../hooks/useWebSocket";
+import { useAuthStore } from "../stores/authStore";
+import { CallOverlay } from "../components/call/CallOverlay";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+export default function RootLayout() {
+  const hydrateFromStorage = useAuthStore((state) => state.hydrateFromStorage);
 
-export default function TabLayout() {
+  useEffect(() => {
+    void hydrateFromStorage();
+  }, [hydrateFromStorage]);
+
+  useWebSocket();
+
   return (
-    <SafeAreaView>
-      <Text className="text-red-500 text-2xl">hka</Text>
-    </SafeAreaView>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="call" />
+      </Stack>
+      <CallOverlay />
+    </>
   );
 }

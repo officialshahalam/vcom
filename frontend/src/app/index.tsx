@@ -1,12 +1,12 @@
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React from "react";
+import { Redirect } from "expo-router";
+import { useAuthStore } from "../stores/authStore";
 
-export default function HomeScreen() {
-  return (
-    <SafeAreaView>
-      <View>
-        <Text className="text-2xl">Hello jh</Text>
-      </View>
-    </SafeAreaView>
-  );
+export default function IndexScreen() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLoading = useAuthStore((state) => state.isLoading);
+
+  if (isLoading) return null;
+
+  return <Redirect href={(isAuthenticated ? "/home" : "/login") as never} />;
 }

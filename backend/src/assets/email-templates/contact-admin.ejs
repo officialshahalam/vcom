@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Contact Message - Vcom</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        background: #ffffff;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #2a2a2a;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 8px;
+      }
+      p {
+        font-size: 15px;
+        color: #333;
+        line-height: 1.6;
+      }
+      blockquote {
+        background: #f0f4ff;
+        border-left: 4px solid #007bff;
+        padding: 12px 16px;
+        margin: 15px 0;
+        font-style: italic;
+        color: #444;
+      }
+      .footer {
+        margin-top: 25px;
+        font-size: 13px;
+        color: #888;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>📩 New Contact Message Received</h2>
+      <p><strong>Name:</strong> <%= name %></p>
+      <p><strong>Email:</strong> <%= email %></p>
+      <p><strong>Message:</strong></p>
+      <blockquote><%= message %></blockquote>
+      <div class="footer">
+        <p>This message was received via the <strong>Vcom Contact Form</strong>.</p>
+        <p>© <%= new Date().getFullYear() %> Vcom. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

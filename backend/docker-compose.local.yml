@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-vcom-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: user1234
+      POSTGRES_DB: vcom_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - vcom-net
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: docker-redis
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    restart: unless-stopped
+    networks:
+      - vcom-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    networks:
+      - vcom-net
+
+volumes:
+  pgdata:
+
+networks:
+  vcom-net:
+    driver: bridge

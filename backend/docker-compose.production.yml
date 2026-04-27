@@ -1,0 +1,66 @@
+services:
+  vcom-app:
+    image: aalam855/vcom:latest
+    container_name: vcom
+    ports:
+      - "6000:4000"
+    env_file:
+      - .env
+    depends_on:
+      vcom-postgres:
+        condition: service_healthy
+      vcom-redis:
+        condition: service_healthy
+      vcom-rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - vcom-net
+
+  vcom-postgres:
+    image: postgres:15
+    container_name: vcom-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: vcom_db
+    volumes:
+      - vcom-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vcom-net
+
+  vcom-redis:
+    image: redis:7-alpine
+    container_name: vcom-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vcom-net
+
+  vcom-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: vcom-rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - vcom-net
+
+volumes:
+  vcom-pgdata:
+
+networks:
+  vcom-net:

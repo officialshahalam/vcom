@@ -11,9 +11,13 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@hookform/resolvers": "^5.2.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.33",
+    "axios": "^1.13.6",
     "babel-preset-expo": "^55.0.12",
     "expo": "~55.0.8",
     "expo-constants": "~55.0.9",
@@ -21,8 +25,10 @@
     "expo-font": "~55.0.4",
     "expo-glass-effect": "~55.0.8",
     "expo-image": "~55.0.6",
+    "expo-linear-gradient": "55.0.11",
     "expo-linking": "~55.0.8",
     "expo-router": "~55.0.7",
+    "expo-secure-store": "55.0.11",
     "expo-splash-screen": "~55.0.12",
     "expo-status-bar": "~55.0.4",
     "expo-symbols": "~55.0.5",
@@ -32,18 +38,25 @@
     "prettier-plugin-tailwindcss": "^0.5.14",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hook-form": "^7.65.0",
     "react-native": "0.83.2",
+    "react-native-emoji-selector": "^0.2.0",
     "react-native-gesture-handler": "~2.30.0",
     "react-native-reanimated": "^4.2.1",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.23.0",
     "react-native-web": "~0.21.0",
-    "react-native-worklets": "0.7.2",
-    "tailwindcss": "^3.4.19"
+    "react-native-worklets": "0.8.1",
+    "tailwindcss": "^3.4.19",
+    "zod": "^4.1.12",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~55.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@10.23.0"
 }
