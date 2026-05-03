@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { WS_EVENTS } from "../constants";
 import { useCallStore } from "../stores/callStore";
 import { useWebSocketStore } from "../stores/webSocketStore";
+import { isPermissionDeniedError, showPermissionDeniedAlert } from "../utils/permissions";
 
 const ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
@@ -69,10 +70,18 @@ const createPeerConnection = (): RTCPeerConnection => {
 };
 
 const acquireLocalMedia = async (connection: RTCPeerConnection): Promise<void> => {
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  localStream = stream;
-  useCallStore.getState().setLocalStream(stream);
-  stream.getTracks().forEach((track) => connection.addTrack(track, stream));
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localStream = stream;
+    useCallStore.getState().setLocalStream(stream);
+    stream.getTracks().forEach((track) => connection.addTrack(track, stream));
+  } catch (error) {
+    if (isPermissionDeniedError(error)) {
+      console.warn("[call] Permission denied for camera/microphone");
+      await showPermissionDeniedAlert();
+    }
+    throw error;
+  }
 };
 
 /**
@@ -124,7 +133,11 @@ export const useWebRTC = (): void => {
           sdp: offer,
         });
       } catch (error) {
-        console.error("[call] failed to start outgoing call", error);
+        if (isPermissionDeniedError(error)) {
+          console.error("[call] Permission denied - camera/microphone access required");
+        } else {
+          console.error("[call] failed to start outgoing call", error);
+        }
         useCallStore.getState().endCall();
         cleanupPeer();
       }
@@ -164,7 +177,11 @@ export const useWebRTC = (): void => {
         useWebSocketStore.getState().send(WS_EVENTS.CALL_ANSWER, { callId, sdp: answer });
         useCallStore.getState().clearPendingOffer();
       } catch (error) {
-        console.error("[call] failed to accept incoming call", error);
+        if (isPermissionDeniedError(error)) {
+          console.error("[call] Permission denied - camera/microphone access required");
+        } else {
+          console.error("[call] failed to accept incoming call", error);
+        }
         useCallStore.getState().endCall();
         cleanupPeer();
       }

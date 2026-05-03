@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, Animated, KeyboardAvoidingView, Platform } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../../stores/authStore";
@@ -35,6 +35,7 @@ export default function ChatConversationScreen() {
   const sendWs = useWebSocketStore((state) => state.send);
 
   const [text, setText] = useState("");
+  const [isVideoButtonPressed, setIsVideoButtonPressed] = useState(false);
   const typingThrottleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const typingStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -95,40 +96,52 @@ export default function ChatConversationScreen() {
   };
 
   return (
-    <View className="flex-1 bg-black pt-12">
-      <View className="flex-row items-center px-4 pb-4">
-        <Pressable onPress={() => router.back()} className="mr-3">
-          <Ionicons name="arrow-back" color="#fff" size={22} />
-        </Pressable>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      style={{ flex: 1 }}
+    >
+      <View className="flex-1 bg-black pt-12">
+        <View className="flex-row items-center px-4 pb-4">
+          <Pressable onPress={() => router.back()} className="mr-3">
+            <Ionicons name="arrow-back" color="#fff" size={22} />
+          </Pressable>
 
-        {otherUser ? (
-          <View className="mr-3">
-            <Avatar uri={otherUser.profilePicture} size={40} online={otherUser.isOnline} />
+          {otherUser ? (
+            <View className="mr-3">
+              <Avatar uri={otherUser.profilePicture} size={40} online={otherUser.isOnline} />
+            </View>
+          ) : null}
+
+          <View className="flex-1">
+            <Text className="text-base font-semibold text-white">{otherUser?.fullName ?? "Chat"}</Text>
+            <Text className="text-xs text-[#8E8E93]">{otherUser ? formatLastSeen(otherUser.lastSeen, otherUser.isOnline) : ""}</Text>
           </View>
-        ) : null}
 
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-white">{otherUser?.fullName ?? "Chat"}</Text>
-          <Text className="text-xs text-[#8E8E93]">{otherUser ? formatLastSeen(otherUser.lastSeen, otherUser.isOnline) : ""}</Text>
+          <Pressable
+            onPress={() => {
+              if (!otherUser) return;
+              useCallStore.getState().startCall({
+                userId: otherUser.id,
+                fullName: otherUser.fullName,
+                profilePicture: otherUser.profilePicture,
+              });
+            }}
+            onPressIn={() => setIsVideoButtonPressed(true)}
+            onPressOut={() => setIsVideoButtonPressed(false)}
+            style={{
+              opacity: isVideoButtonPressed ? 0.6 : 1,
+              transform: [{ scale: isVideoButtonPressed ? 0.95 : 1 }],
+            }}
+          >
+            <Ionicons name="videocam-outline" color="#fff" size={22} />
+          </Pressable>
         </View>
 
-        <Pressable
-          onPress={() => {
-            if (!otherUser) return;
-            useCallStore.getState().startCall({
-              userId: otherUser.id,
-              fullName: otherUser.fullName,
-              profilePicture: otherUser.profilePicture,
-            });
-          }}
-        >
-          <Ionicons name="videocam-outline" color="#fff" size={22} />
-        </Pressable>
+        <MessageList messages={messagesMap[String(conversationId)] ?? []} currentUserId={user?.id} />
+
+        <ChatInput value={text} onChangeText={sendTyping} onSend={send} />
       </View>
-
-      <MessageList messages={messagesMap[String(conversationId)] ?? []} currentUserId={user?.id} />
-
-      <ChatInput value={text} onChangeText={sendTyping} onSend={send} />
-    </View>
+    </KeyboardAvoidingView>
   );
 }

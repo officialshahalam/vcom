@@ -20,6 +20,7 @@ type CallStore = {
   pendingIce: RTCIceCandidateInit[];
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
+  showPermissionModal: boolean;
 
   startCall: (peer: CallPeer) => void;
   onIncomingCall: (params: { callId: string; from: number; sdp: RTCSessionDescriptionInit }) => void;
@@ -28,6 +29,7 @@ type CallStore = {
   onCallAnswered: (params: { callId: string; sdp: RTCSessionDescriptionInit }) => void;
   onRemoteCallEnd: () => void;
   endCall: () => void;
+  setShowPermissionModal: (show: boolean) => void;
 
   setCallId: (callId: string) => void;
   setLocalStream: (stream: MediaStream | null) => void;
@@ -49,13 +51,14 @@ const initialState = {
   pendingIce: [] as RTCIceCandidateInit[],
   localStream: null,
   remoteStream: null,
+  showPermissionModal: false,
 };
 
 export const useCallStore = create<CallStore>((set, get) => ({
   ...initialState,
 
   startCall: (peer) => {
-    set({ ...initialState, status: "calling", peer, isCaller: true });
+    set({ ...initialState, status: "calling", peer, isCaller: true, showPermissionModal: true });
   },
 
   onIncomingCall: ({ callId, from, sdp }) => {
@@ -68,12 +71,13 @@ export const useCallStore = create<CallStore>((set, get) => ({
       peer: { userId: from },
       isCaller: false,
       pendingRemoteOffer: sdp,
+      showPermissionModal: true,
     });
   },
 
   acceptCall: () => {
     if (get().status !== "ringing") return;
-    set({ status: "active" });
+    set({ status: "active", showPermissionModal: false });
   },
 
   rejectCall: () => {
@@ -82,7 +86,7 @@ export const useCallStore = create<CallStore>((set, get) => ({
   },
 
   onCallAnswered: ({ callId, sdp }) => {
-    set({ callId, pendingRemoteAnswer: sdp, status: "active" });
+    set({ callId, pendingRemoteAnswer: sdp, status: "active", showPermissionModal: false });
   },
 
   onRemoteCallEnd: () => {
@@ -94,6 +98,8 @@ export const useCallStore = create<CallStore>((set, get) => ({
     get().localStream?.getTracks().forEach((t) => t.stop());
     set({ ...initialState });
   },
+
+  setShowPermissionModal: (show) => set({ showPermissionModal: show }),
 
   setCallId: (callId) => set({ callId }),
   setLocalStream: (localStream) => set({ localStream }),
